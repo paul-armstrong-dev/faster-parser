@@ -66,7 +66,7 @@ as it does come with quite a big overhead in terms of requirements
 
 #### Example pip usage
 ```
-pip install faster-parser
+pip install faster-parser==0.1.0
 ```
 
 ```

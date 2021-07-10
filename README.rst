@@ -13,9 +13,6 @@ Faster Parser
         :target: https://faster-parser.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
 
-
-
-
 Util function to process data concurrently
 
 
@@ -26,7 +23,7 @@ Util function to process data concurrently
 Features
 --------
 
-See readme.md
+* See readme.md
 
 Credits
 -------
