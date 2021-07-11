@@ -1,6 +1,7 @@
 """Main module."""
 from concurrent import futures
 from loguru import logger
+from tqdm import tqdm
 
 
 def fast_parse(python_class, parse_function, data_to_parse, number_of_workers=4, **kwargs):
@@ -24,20 +25,29 @@ def fast_parse(python_class, parse_function, data_to_parse, number_of_workers=4,
         return
     else:
         results = []
-        with futures.ThreadPoolExecutor(max_workers=number_of_workers) as executor:
-            if type(data_to_parse)==list:
-                future_to_result = {executor.submit(function_object, data, **kwargs): data for data in data_to_parse}
-            elif type(data_to_parse)==dict:
-                for index, data in data_to_parse.items():
-                    future_to_result = {executor.submit(function_object, index, data, **kwargs)}
-            else:
-                logger.error("Unsupported data type")
-                return
-            for future in futures.as_completed(future_to_result):
-                try:
-                    data = future.result()
-                except Exception as exc:
-                    logger.error(f"{future_to_result[future]} generated an exception: {exc}")
+        data_len = len(data_to_parse)
+        with tqdm(total=data_len) as pbar:
+            with futures.ThreadPoolExecutor(max_workers=number_of_workers) as executor:
+
+                if type(data_to_parse) == list:
+                    future_to_result = {executor.submit(function_object, data, **kwargs): data for data in data_to_parse}
+
+                elif type(data_to_parse) == dict:
+                    for index, data in data_to_parse.items():
+                        future_to_result = {executor.submit(function_object, data, **kwargs)}
+
                 else:
-                    results.append(data)
+                    logger.error("Unsupported data type")
+                    return
+
+                for future in futures.as_completed(future_to_result):
+                    try:
+                        data = future.result()
+                    except Exception as exc:
+                        logger.error(f"{future_to_result[future]} generated an exception: {exc}")
+                    else:
+                        results.append(data)
+                        pbar.update(1)
         return results
+
+
